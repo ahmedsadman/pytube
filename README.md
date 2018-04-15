@@ -2,7 +2,7 @@
 <div align="center">
   <p>
   <img src="./images/pytube.png" width="350" height="328" alt="pytube logo" />
-  </p> 
+  </p>
   <p align="center">
 	  <img src="https://img.shields.io/pypi/v/pytube.svg" alt="pypi">
 	  <a href="https://travis-ci.org/nficano/pytube"><img src="https://travis-ci.org/nficano/pytube.svg?branch=master" /></a>
@@ -13,7 +13,7 @@
 </div>
 
 # pytube
-*pytube* is a lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
+*pytube* is a very serious, lightweight, dependency-free Python library (and command-line utility) for downloading YouTube Videos.
 
 ## Description
 YouTube is the most popular video-sharing platform in the world and as a hacker you may encounter a situation where you want to script something to download videos.  For this I present to you *pytube*.
@@ -140,9 +140,11 @@ You can also download a complete Youtube playlist:
 >>> from pytube import Playlist
 >>> pl = Playlist("https://www.youtube.com/watch?v=Edpy1szoG80&list=PL153hDY-y1E00uQtCVCVC8xJ25TYX8yPU")
 >>> pl.download_all()
+>>> # or if you want to download in a specific directory
+>>> pl.download_all('/path/to/directory/')
 ```
-This will download the highest progressive stream available (generally 720p) from the given playlist. Later more option would be give users flexibility
-to choose video resolution. Playlist videos will be downloaded in the directory from where the command was run.
+This will download the highest progressive stream available (generally 720p) from the given playlist. Later more options would be given for user's flexibility
+to choose video resolution.
 
 Pytube allows you to filter on every property available (see the documentation for the complete list), let's take a look at some of the most useful ones.
 

@@ -19,9 +19,9 @@ from pytube import mixins
 from pytube import request
 from pytube import Stream
 from pytube import StreamQuery
+from pytube.compat import install_proxy
 from pytube.compat import parse_qsl
 from pytube.helpers import apply_mixin
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class YouTube(object):
 
     def __init__(
         self, url=None, defer_prefetch_init=False, on_progress_callback=None,
-        on_complete_callback=None,
+        on_complete_callback=None, proxies=None,
     ):
         """Construct a :class:`YouTube <YouTube>`.
 
@@ -57,6 +57,7 @@ class YouTube(object):
         self.vid_info_url = None  # the url to vid info, parsed from watch html
 
         self.watch_html = None     # the html of /watch?v=<video_id>
+        self.embed_html = None
         self.player_config_args = None  # inline js in the html containing
         # streams
         self.age_restricted = None
@@ -78,6 +79,9 @@ class YouTube(object):
             'on_progress': on_progress_callback,
             'on_complete': on_complete_callback,
         }
+
+        if proxies:
+            install_proxy(proxies)
 
         if not defer_prefetch_init:
             self.prefetch_init()
@@ -123,8 +127,14 @@ class YouTube(object):
                 mixins.apply_descrambler(self.vid_info, fmt)
             mixins.apply_descrambler(self.player_config_args, fmt)
 
-            # apply the signature to the download url.
-            mixins.apply_signature(self.player_config_args, fmt, self.js)
+            try:
+                mixins.apply_signature(self.player_config_args, fmt, self.js)
+            except TypeError:
+                self.js_url = extract.js_url(
+                    self.embed_html, self.age_restricted,
+                )
+                self.js = request.get(self.js_url)
+                mixins.apply_signature(self.player_config_args, fmt, self.js)
 
             # build instances of :class:`Stream <Stream>`
             self.initialize_stream_objects(fmt)
@@ -157,7 +167,7 @@ class YouTube(object):
         )
         self.vid_info = request.get(self.vid_info_url)
         if not self.age_restricted:
-            self.js_url = extract.js_url(self.watch_html)
+            self.js_url = extract.js_url(self.watch_html, self.age_restricted)
             self.js = request.get(self.js_url)
 
     def initialize_stream_objects(self, fmt):
