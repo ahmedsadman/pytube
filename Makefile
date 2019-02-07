@@ -8,7 +8,7 @@ ci:
 	pip install pipenv
 	pipenv install --dev
 	pipenv run flake8
-	pipenv run pytest --cov-report term-missing --cov=pytube
+	pipenv run pytest --cov-report term-missing --cov=pytube --ignore=W605
 
 clean: clean-build clean-pyc
 
@@ -25,6 +25,7 @@ clean-pyc:
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
+	find . -name '.pytest_cache' -exec rm -fr {} +
 
 install: clean
 	python setup.py install
